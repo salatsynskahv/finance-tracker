@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js"></script>
+
+</head>
+<body>
+<input type="file" id="input" />
+<script>
+    var input = document.getElementById('input')
+    input.addEventListener('change', function() {
+        console.log(input.files[0]);
+        readXlsxFile(input.files[0]).then(function(rows) {
+            // `rows` is an array of rows
+            // each row being an array of cells.
+        })
+    })
+
+</script>
+
+</body>
+</html>
