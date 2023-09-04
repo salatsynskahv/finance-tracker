@@ -4,6 +4,7 @@ import {useEffect, useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from "axios";
 import HomeInner from "../components/HomeInner";
+import {HomePage} from "../components/HomaPage";
 
 export default function Home() {
     const [loading, setLoading] = useState(true);
@@ -28,7 +29,7 @@ export default function Home() {
     return (
         <>
             { loading && (<p>Loading</p>) }
-            { !loading && (<HomeInner categoriesToCode={categoriesToCode}/>) }
+            { !loading && (<HomePage />) }
         </>
     )
 }

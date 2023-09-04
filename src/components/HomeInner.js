@@ -16,7 +16,6 @@ const HomeInner = ({categoriesToCode}) => {
     categoryNames.forEach(category => sumByCategories[category] = 0);
     console.log(sumByCategories);
 
-    const fileInputRef = useRef();
     const [userName, setUserName] = useState();
     const [rows, setRows] = useState([]);
     const [groupedByCategory, setGroupedByCategory] = useState([]);
@@ -39,28 +38,6 @@ const HomeInner = ({categoriesToCode}) => {
         row['categoryName'] = category ? category.name : 'Other';
     }
 
-    const onInputFileChange = (e) => {
-        readXlsxFile(e.target.files[0]).then(rows => {
-            const rowsObj = rows.slice(20).map(row => {
-                return {
-                    'dateOfOperation': row[0],
-                    'details': row[1],
-                    'categoryCode': row[2],
-                    'sum': row[3]
-                }
-            });
-            // newRows.concat(rowsObj);
-
-            rowsObj.forEach(
-                row => {
-                    defineCategory(row);
-                }
-            );
-            groupByCategory(rowsObj);
-            setRows(rowsObj);
-        });
-
-    }
 
     const groupByCategory = (rowsObj) => {
         console.log(rowsObj);
@@ -111,7 +88,7 @@ const HomeInner = ({categoriesToCode}) => {
         <>
             <button onClick={() => handleGoogleLogin()}> Login </button>
             {userName}
-            <input type="file" id="file-input" ref={fileInputRef} onChange={onInputFileChange}/>
+            {/*<input type="file" id="file-input" ref={fileInputRef} onChange={onInputFileChange}/>*/}
             <div className="center-container">
                 <Tabs tabState={tabState} setTabState={setTabState}/>
             </div>
