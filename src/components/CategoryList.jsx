@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {FormControl, InputLabel, MenuItem, Popover, Select} from "@mui/material";
 import PopoverCategoryChange from "./PopoverCategoryChange";
 
 const CategoryList = ({groupedByCategory, categoryNames, changeCategory}) => {

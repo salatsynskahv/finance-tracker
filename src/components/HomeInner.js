@@ -1,8 +1,7 @@
 import Tabs from "./Tabs";
 import CategoryList from "./CategoryList";
 import AllList from "./AllList";
-import {useRef, useState} from "react";
-import readXlsxFile from "read-excel-file";
+import {useState} from "react";
 import CreateCategory from "./CreateCategory";
 import {signInWithPopup } from "firebase/auth";
 import {auth, provider} from "../firebase";
@@ -86,9 +85,11 @@ const HomeInner = ({categoriesToCode}) => {
 
     return (
         <>
-            <button onClick={() => handleGoogleLogin()}> Login </button>
-            {userName}
-            {/*<input type="file" id="file-input" ref={fileInputRef} onChange={onInputFileChange}/>*/}
+            <header>
+                <button onClick={() => handleGoogleLogin()}> Login </button>
+                {userName}
+                <input type="file" id="file-input" ref={fileInputRef} onChange={onInputFileChange}/>
+            </header>
             <div className="center-container">
                 <Tabs tabState={tabState} setTabState={setTabState}/>
             </div>
@@ -100,7 +101,8 @@ const HomeInner = ({categoriesToCode}) => {
                 <div className="tabs-container">
                     {
                         tabState[0] ?
-                            <CategoryList groupedByCategory={groupedByCategory} changeCategory={changeCategory}
+                            <CategoryList groupedByCategory={groupedByCategory}
+                                          changeCategory={changeCategory}
                                           categoryNames={categoryNames}/> :
                             <AllList rows={rows}/>
                     }
