@@ -1,36 +1,42 @@
 import readXlsxFile from "read-excel-file";
-import {useRef} from "react";
+import {useRef, useState} from "react";
 import DownloadFile from "./DownloadFile";
 import ConnectWithApi from "./ConnectWithApi";
+import Login from "@/components/Login";
 
 
 export const HomePage = () => {
 
 
-
     return (<>
-
         <div className="home-page">
-            <div className="info">
-                <p>
-                    Hello! I am your finance helper. I will help you to research your expenses and incomes.
-                </p>
-            </div>
-            <div className="column">
-                <h4>Provide data with Monobank API</h4>
-                <ul>
-                    <ConnectWithApi/>
-                </ul>
+            <header>
+                <div className="info">
+                    <span>
+                        Hello! I am your finance helper. I will help you to research your expenses and incomes.
+                    </span>
+                    <Login/>
+                </div>
+            </header>
+{/*Todo: imlement */}
+            {/*<div className="column">*/}
+            {/*    <h4>Provide data with Monobank API</h4>*/}
+            {/*    <div className="content">*/}
+            {/*        <ul>*/}
+            {/*            <ConnectWithApi/>*/}
+            {/*        </ul>*/}
+            {/*    </div>*/}
 
-            </div>
+            {/*</div>*/}
             <div className="column">
-                <h4>Download Monobank generated stylesheet with expenses</h4>
-                <ul>
-                    <li>
-                      <DownloadFile/>
-                    </li>
-                </ul>
-
+                <h4> Download Monobank generated stylesheet with expenses </h4>
+                <div className="content">
+                    <ul>
+                        <li>
+                            <DownloadFile/>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </>);

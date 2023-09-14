@@ -1,5 +1,6 @@
+@import 'bootstrap/dist/css/bootstrap.css';
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
-@import "accordion";
+@import "../accordion";
 
 
 $primary-color:  #e6eef9;
@@ -17,14 +18,17 @@ $char-color: #45B69C;
 *:after,
 *:before {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-body {
+
+body, html {
   font-family: "Inter", sans-serif;
-  background-color: rgba(#e6eef9, 0.5);
+  background-color: #FFFFFF;
 }
 
-.ft-button {
+@mixin ft-button {
   border: none;
   border-radius: 20px;
   background-color: $positive-action-color;
@@ -34,21 +38,23 @@ body {
 }
 
 .home-page {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
 
   ul {
     list-style: none;
   }
 
   .info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: $primary-color;
     width: 100%;
     height: 100px;
-    grid-column-start: 1;
-    grid-column-end: 3;
     padding: 10px;
     text-align: center;
+    text-wrap: balance;
   }
 
   .column {
@@ -59,6 +65,14 @@ body {
     padding: 20px;
     text-align: center;
     text-wrap: balance;
+
+    button, input::file-selector-button {
+      @include ft-button();
+    }
+
+    .content {
+      margin-top: 1rem;
+    }
   }
 
 }
@@ -67,7 +81,7 @@ header {
   display: flex;
   justify-content: flex-end;
 
-  button, input::file-selector-button {
+  button{
     margin: 10px;
     padding: 10px;
     border: none;
@@ -75,15 +89,38 @@ header {
     border-radius: 20px;
   }
 
-  button:hover, input::file-selector-button:hover {
+  button:hover {
     background-color: $primary-color;
     opacity: 0.8;
   }
 }
 
-.category-name {
-  color: dodgerblue;
+
+.category-name-header {
+  background-color: #FFFFFF;
+  height: 2rem;
+  align-items: center;
   font-size: 20px;
+  border: 0.1px solid $primary-color;
+  border-bottom: none;
+  border-top: none;
+  //border-bottom: none ;
+  width: 400px;
+  display: flex;
+  justify-content: space-between;
+
+  span {
+    font-size: 1rem;
+  }
+
+}
+
+.category-name-header:last-child {
+  border: 0.1px solid $primary-color;
+}
+
+.category-name-body,  .category-name-header:first-child {
+  border-top: 0.1px solid $primary-color;
 }
 
 .center-container {
@@ -114,6 +151,20 @@ header {
 
 }
 
+.create-category-title{
+  font-size: 1.2rem;
+  margin-top: auto;
+  padding-bottom: 4px;
+}
+
+.all-categories {
+  padding: 10px;
+
+  .create-category-btn {
+    border: none;
+    background: none;
+  }
+}
 .edit-popover-content {
   display: flex;
   flex-direction: column;
@@ -234,26 +285,28 @@ input[id="radio-3"] {
 
 
 .create-category {
-  align-self: flex-start;
+  padding: 10px;
 
-  &-inner {
-    margin-left: 1rem;
-    max-width: 10rem;
-  }
-
-  .cancel {
-    position: relative;
-    left: 12rem;
-  }
 }
 
 .tabs-container{
   margin-right: auto;
   margin-left: auto;
+  width: 100vw;
 }
 
-@media (max-width: 700px) {
-  .tabs {
-    transform: scale(0.6);
+.all-expences {
+  width: 100%;
+  border: 1px solid $border-color;
+
+  tr {
+    border: 1px solid $border-color;
   }
 }
+
+
+.user-name {
+  display: inline-block;
+  margin: 0 2rem ;
+}
+@import "mobile";

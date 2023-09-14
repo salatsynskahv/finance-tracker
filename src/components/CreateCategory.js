@@ -1,26 +1,68 @@
 import React, {useRef, useState} from 'react';
-import {MdOutlineCancel} from "react-icons/all";
+import {Button, Popover} from "@mui/material";
+import {MdOutlineAddCircleOutline} from "react-icons/md";
+import axios from "axios";
+import {useAppStore} from "@/app/store/slice";
 
 
-const CreateCategory = ({addCategory}) => {
-    const [show, setShow] = useState(false);
+const CreateCategory = ({setCategories}) => {
+    const {username} = useAppStore((state) => state.username);
+    console.log(username);
     const categoryName = useRef();
 
-    return (
-        <div className="create-category-inner">
-            {!show && <button
-                className="btn"
-                onClick={() => {
-                    setShow(true)
-                }}
-            > Create Category </button>
-            }
+    const [anchorEl, setAnchorEl] = useState();
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const open = Boolean(anchorEl);
+    const id = open ? 'createCategoryModal' : undefined;
+
+    const addCategory = (name) => {
+        const result = axios.post(`http://localhost:3001/newCategory`,
             {
-                show &&
-                <div>
-                    <button className="btn cancel" onClick={() => setShow(false)}><MdOutlineCancel/></button>
-                    <br/>
-                    <label htmlFor="category-name">Category name</label>
+                username: username,
+                name: name
+            }).then(
+            (response) => {
+                const newCategoryItem = {
+                    id: response.id,
+                    name: response.name,
+                    codes: [],
+                    shops: []
+                }
+            }
+        )
+    }
+
+    return (<>
+            <button
+                type="button"
+                className="btn"
+                aria-describedby={id}
+                onClick={handleClick}
+            >
+                <MdOutlineAddCircleOutline/>
+            </button>
+            <Popover
+                id={id}
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <div className="create-category">
+                    <label htmlFor="category-name">
+                        Category name
+                    </label>
                     <br/>
                     <input id="category-name" ref={categoryName}/>
                     <div className="d-flex">
@@ -33,9 +75,8 @@ const CreateCategory = ({addCategory}) => {
                         </button>
                     </div>
                 </div>
-            }
-
-        </div>
+            </Popover>
+        </>
     );
 }
 

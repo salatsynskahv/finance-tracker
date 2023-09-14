@@ -1,20 +1,25 @@
 import React from 'react'
 
-const AllList = ({rows}) => {
+const AllList = ({allExpences}) => {
     return (
         <div className="center-container">
-            {
-                rows.map(row =>
-                    (
-                        <div>
-                            {row.dateOfOperation}
-                            {row.details}
-                            {row.categoryCode}
-                            {row.sum}
-                        </div>
+            <table className="all-expences">
+                <thead>
+
+                </thead>
+                <tbody>
+                {
+                    allExpences.map(item =>
+                        <tr key={item.dateOfOperation}>
+                            {
+                                Object.values(item).map((value, index) =>
+                                <td key={index}> {value} </td>)
+                            }
+                        </tr>
                     )
-                )
-            }
+                }
+                </tbody>
+            </table>
         </div>
     )
 }
