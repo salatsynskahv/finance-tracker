@@ -29,7 +29,7 @@ const DownloadFile = () => {
     }
 
 
-    return <>
+    return (<div className="download">
         <form action="">
             <label htmlFor="file-input">
                 1. Select file with data and load
@@ -41,7 +41,7 @@ const DownloadFile = () => {
                    onChange={onInputFileChange}
             />
         </form>
-    </>
+    </div>)
 };
 
 export default DownloadFile;

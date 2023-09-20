@@ -1,8 +1,6 @@
-import readXlsxFile from "read-excel-file";
-import {useRef, useState} from "react";
-import DownloadFile from "./DownloadFile";
-import ConnectWithApi from "./ConnectWithApi";
 import Login from "@/components/Login";
+import Multistep from "@/components/multistep/Multistep";
+import DownloadFile from "@/components/DownloadFile";
 
 
 export const HomePage = () => {
@@ -15,7 +13,6 @@ export const HomePage = () => {
                     <span>
                         Hello! I am your finance helper. I will help you to research your expenses and incomes.
                     </span>
-                    <Login/>
                 </div>
             </header>
 {/*Todo: imlement */}
@@ -29,14 +26,7 @@ export const HomePage = () => {
 
             {/*</div>*/}
             <div className="column">
-                <h4> Download Monobank generated stylesheet with expenses </h4>
-                <div className="content">
-                    <ul>
-                        <li>
-                            <DownloadFile/>
-                        </li>
-                    </ul>
-                </div>
+               <Multistep/>
             </div>
         </div>
     </>);

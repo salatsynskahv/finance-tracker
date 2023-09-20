@@ -3,10 +3,12 @@ import {Button, Popover} from "@mui/material";
 import {MdOutlineAddCircleOutline} from "react-icons/md";
 import axios from "axios";
 import {useAppStore} from "@/app/store/slice";
+import {error} from "next/dist/build/output/log";
 
 
-const CreateCategory = ({setCategories}) => {
-    const {username} = useAppStore((state) => state.username);
+const CreateCategory = ({categories, setCategories}) => {
+    // const {username} = useAppStore((state) => state.username);
+    const username = 'salatsynskahv@gmail.com';
     console.log(username);
     const categoryName = useRef();
 
@@ -24,20 +26,15 @@ const CreateCategory = ({setCategories}) => {
     const id = open ? 'createCategoryModal' : undefined;
 
     const addCategory = (name) => {
-        const result = axios.post(`http://localhost:3001/newCategory`,
+        axios.post(`http://localhost:3001/newUserCategory`,
             {
                 username: username,
-                name: name
+                newCategoryName: name
             }).then(
             (response) => {
-                const newCategoryItem = {
-                    id: response.id,
-                    name: response.name,
-                    codes: [],
-                    shops: []
-                }
-            }
-        )
+                 setCategories(response.data.categories);
+                handleClose();
+            }).catch(error => console.log(error));
     }
 
     return (<>

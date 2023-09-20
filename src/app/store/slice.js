@@ -7,7 +7,7 @@ export const useAppStore = create((set) => (
             allExpences: [],
             categories: [],
             categoryExpences: [],
-            initUsername: (username) => set((username => ({ username: username }))),
+            initUsername: (username) => set({ username }),
             initAllExpences : (allExpences) => set({allExpences: allExpences}),
             initCategories: (categories) => set({categories: categories}),
             initCategoryExpences: (categoryExpences) => set({categoryExpences : categoryExpences})

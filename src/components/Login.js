@@ -3,11 +3,11 @@ import {signInWithPopup} from "firebase/auth";
 import {auth, provider} from "@/firebase";
 import {useAppStore} from "@/app/store/slice";
 import {shallow} from "zustand/shallow";
+import {FcGoogle} from "react-icons/fc";
 
 const Login = () => {
-    const [username, initUsername] = useAppStore(
-        (state) => [state.username, state.initUsername],
-        shallow
+    const initUsername = useAppStore(
+        (state) => state.initUsername, shallow
     );
 
     const [name, setName] = useState('');
@@ -25,7 +25,7 @@ const Login = () => {
     }, [name]);
 
     return (
-        <>
+        <div className="login">
             {
                 name && <>
                     <span className="user-name"> {name} </span>
@@ -33,10 +33,11 @@ const Login = () => {
                 </>
             }
             {
-                !name && <button onClick={() => handleGoogleLogin()}> Login </button>
+                !name && <button className="login-btn" onClick={() => handleGoogleLogin()}>
+                    Login with Google <FcGoogle size="1.6em" style={{margin: "-3px 0 0 5px"}}/>  </button>
             }
 
-        </>
+        </div>
     );
 }
 

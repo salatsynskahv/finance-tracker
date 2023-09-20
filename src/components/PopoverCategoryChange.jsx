@@ -2,14 +2,15 @@ import React, {useState} from 'react';
 import {InputLabel, MenuItem, Popover, Select} from "@mui/material";
 import {CiEdit} from "react-icons/ci";
 
-const PopoverCategoryChange = ({item, changeCategory, categoryNames}) => {
+const PopoverCategoryChange = ({item, changeCategory, categories}) => {
 
-    console.log(item);
-
-    console.log(categoryNames);
     const [selectedRowToEdit, setSelectedRowToEdit] = useState();
     const [anchorEl, setAnchorEl] = useState();
-    const [selectedCategory, setSelectedCategory] = useState(item && item.categoryName);
+    const [selectedCategory, setSelectedCategory] = useState(item && item.categoryName || (categories[0] && categories[0].name) || '');
+
+    if(!categories) {
+        return (<></>)
+    }
 
     return (
         <>
@@ -49,9 +50,9 @@ const PopoverCategoryChange = ({item, changeCategory, categoryNames}) => {
                         }}
                     >
                         {
-                            categoryNames.map(value => (
-                                <MenuItem key={value} value={value}>
-                                    {value}
+                            categories.map((value, index) => (
+                                <MenuItem key={index} value={value.name}>
+                                    {value.name}
                                 </MenuItem>)
                             )
                         }
@@ -71,12 +72,10 @@ const PopoverCategoryChange = ({item, changeCategory, categoryNames}) => {
                         <button className="btn btn-primary m-3"
                                 onClick={(e) => {
                                     const newItem = {...item, categoryName: selectedCategory}
-                                    changeCategory(e, newItem)
+                                    changeCategory(selectedCategory, selectedRowToEdit)
                                 }}> Save
                         </button>
                     </div>
-
-
                 </div>
 
             </Popover>
