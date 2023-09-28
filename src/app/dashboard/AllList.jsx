@@ -2,10 +2,15 @@ import React from 'react'
 
 const AllList = ({allExpences}) => {
     return (
-        <div className="center-container">
+        <div className="center-container all-list-padding">
             <table className="all-expences">
                 <thead>
-
+                <tr>
+                    <th>Date of Operation</th>
+                    <th>Details</th>
+                    <th>Code</th>
+                    <th>Sum</th>
+                </tr>
                 </thead>
                 <tbody>
                 {

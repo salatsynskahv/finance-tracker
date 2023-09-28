@@ -1,11 +1,7 @@
-import Login from "@/components/Login";
-import Multistep from "@/components/multistep/Multistep";
-import DownloadFile from "@/components/DownloadFile";
+import Steps from "@/components/multistep/Steps";
 
 
 export const HomePage = () => {
-
-
     return (<>
         <div className="home-page">
             <header>
@@ -15,18 +11,7 @@ export const HomePage = () => {
                     </span>
                 </div>
             </header>
-{/*Todo: imlement */}
-            {/*<div className="column">*/}
-            {/*    <h4>Provide data with Monobank API</h4>*/}
-            {/*    <div className="content">*/}
-            {/*        <ul>*/}
-            {/*            <ConnectWithApi/>*/}
-            {/*        </ul>*/}
-            {/*    </div>*/}
-
-            {/*</div>*/}
             <div className="column">
-               <Multistep/>
             </div>
         </div>
     </>);

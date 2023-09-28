@@ -3,44 +3,30 @@ import {useRouter} from "next/navigation";
 import {shallow} from "zustand/shallow";
 import {useAppStore} from "@/app/store/slice";
 import readXlsxFile from "read-excel-file";
+import ParseXlsFile from "@/components/ParseXlsFile";
 
 const DownloadFile = () => {
     const fileInputRef = useRef();
     const router = useRouter();
 
-    const [allExpences, initAllExpences] = useAppStore(
-        (state) => [state.allExpences, state.initAllExpences],
-        shallow
-    );
+    const initAllExpences = useAppStore((state) => state.initAllExpences, shallow);
 
     const onInputFileChange = (e) => {
+        ParseXlsFile(e.target.file[0], initAllExpences);
         router.push('/dashboard');
-        readXlsxFile(e.target.files[0]).then(rows => {
-            const parsedRows = rows.slice(20).map(row => {
-                return {
-                    'dateOfOperation': row[0],
-                    'details': row[1],
-                    'categoryCode': row[2],
-                    'sum': row[3]
-                }
-            });
-            initAllExpences(parsedRows);
-        });
     }
 
 
     return (<div className="download">
-        <form action="">
-            <label htmlFor="file-input">
-                1. Select file with data and load
-            </label>
+            <p >
+                <h4>Please, load file with expences</h4>
+            </p>
             <input type="file"
                    id="file-input"
                    ref={fileInputRef}
                    accept=".xls"
                    onChange={onInputFileChange}
             />
-        </form>
     </div>)
 };
 

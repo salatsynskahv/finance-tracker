@@ -6,13 +6,14 @@ import {useAppStore} from "@/app/store/slice";
 import {error} from "next/dist/build/output/log";
 
 
-const CreateCategory = ({categories, setCategories}) => {
+const CreateCategory = ({setCategories}) => {
     // const {username} = useAppStore((state) => state.username);
     const username = 'salatsynskahv@gmail.com';
     console.log(username);
-    const categoryName = useRef();
+    const [categoryName, setCategoryName] = useState();
 
     const [anchorEl, setAnchorEl] = useState();
+    const [validationMessage, setValidationMessage] = useState();
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -25,16 +26,34 @@ const CreateCategory = ({categories, setCategories}) => {
     const open = Boolean(anchorEl);
     const id = open ? 'createCategoryModal' : undefined;
 
-    const addCategory = (name) => {
+    const addCategory = () => {
+        if (validationMessage) {
+            return;
+        }
         axios.post(`http://localhost:3001/newUserCategory`,
             {
                 username: username,
-                newCategoryName: name
+                newCategoryName: categoryName
             }).then(
             (response) => {
-                 setCategories(response.data.categories);
+                setCategories(response.data.categories);
                 handleClose();
             }).catch(error => console.log(error));
+    }
+
+    const isValidName = (name) => {
+        if (!name || name.length === 0) {
+            setValidationMessage((<>Please, provide <em>Category Name</em></>));
+            return false;
+        }
+        setValidationMessage(null);
+        return true;
+    }
+
+    const clearValidationMessage = (name) => {
+        if (name &&  name.length > 0) {
+            setValidationMessage(null);
+        }
     }
 
     return (<>
@@ -61,16 +80,24 @@ const CreateCategory = ({categories, setCategories}) => {
                         Category name
                     </label>
                     <br/>
-                    <input id="category-name" ref={categoryName}/>
+                    <input id="category-name"
+                           value={categoryName}
+                           onChange={(e) => {
+                               setCategoryName(e.target.value);
+                               clearValidationMessage(e.target.value);
+                    }}/>
                     <div className="d-flex">
                         <button
                             className="btn btn-primary m-2"
                             onClick={() => {
-                                addCategory(categoryName.current.value)
+                                if(isValidName(categoryName)) {
+                                    addCategory(categoryName);
+                                }
                             }}>
                             Add
                         </button>
                     </div>
+                    {validationMessage && <div>{validationMessage}</div>}
                 </div>
             </Popover>
         </>

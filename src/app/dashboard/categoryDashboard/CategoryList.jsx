@@ -1,29 +1,27 @@
 import React, {useEffect, useState} from 'react';
-import PopoverCategoryChange from "./PopoverCategoryChange";
+import PopoverCategoryChange from "../../../components/PopoverCategoryChange";
 
 import {FormControl, MenuItem, Select} from "@mui/material";
 
 import {CiEdit} from "react-icons/ci";
 import {FcCheckmark} from "react-icons/fc";
 import {VscClose} from "react-icons/vsc";
-import CreateCategory from "@/components/CreateCategory";
-import CategoryNamesList from "@/components/CategoryNamesList";
+import CreateCategory from "@/app/dashboard/categoryDashboard/CreateCategory";
+import CategoryNamesList from "@/app/dashboard/categoryDashboard/CategoryNamesList";
 import axios from "axios";
 import {useAppStore} from "@/app/store/slice";
-import {error} from "next/dist/build/output/log";
 import {shallow} from "zustand/shallow";
+import FTrClient from "@/app/service/axios/FTrClient";
 
-const CategoryList = ({allExpences}) => {
-    // console.log(allExpences);
-    const [expencesSt, username] = useAppStore(
-        (state) => [state.allExpences, state.username],
+const CategoryList = ({allRecords}) => {
+    const [username, initSumByCategories] = useAppStore(
+        (state) => [state.username, state.initSumByCategories],
         shallow
     );
-    console.log(expencesSt);
-    console.log(username);
-    const [expences, setExpences] = useState(allExpences);
+    const [expences, setExpences] = useState(allRecords);
     const [categories, setCategories] = useState([]);
     const [groupedByCategory, setGroupedByCategory] = useState({});
+    const [sumByCategories, setSumByCategories] = useState({});
     const [onEdit, setOnEdit] = useState();
     const [selectedCategory, setSelectedCategory] = useState();
     // const username = useAppStore((state) => state.username);
@@ -34,31 +32,22 @@ const CategoryList = ({allExpences}) => {
 
 
     useEffect(() => {
-            // const groupedByCategory = allExpences.reduce((accumulator, currentValue) => {
-            //     (accumulator[currentValue.categoryCode] = accumulator[currentValue.categoryCode] || []).push(currentValue);
-            //     return accumulator;
-            // }, {});
-            // console.log(groupedByCategory);
-            // setGroupedByCategory(groupedByCategory);
             const getCategories = async () => {
-                // console.log(groupedByCategory);
-                // console.log(username);
+                console.log(allRecords);
 
                 const createDefaultUserCategories = async () => {
-                    if (!groupedByCategory || groupedByCategory.size < 1) {
-                        return;
-                    }
-                    const defaultCategories = await axios.get(`http://localhost:3001/allCategories`);
+                    const defaultCategories = await FTrClient.get('/allCategories');
 
-                    const usedKeys = Object.keys(groupedByCategory);
-                    // console.log(usedKeys);
-                    // console.log(defaultCategories.data);
+                    const usedKeys = new Set();
+                    allRecords.forEach(record => usedKeys.add(record.categoryCode));
+
                     const flatDefaultCategories = {};
                     defaultCategories.data.forEach(item => {
                         return item.codes.forEach(code => {
                             flatDefaultCategories[code] = item;
                         });
                     });
+
                     const usedCategories = new Set();
                     usedKeys.forEach((key) => {
                         const category = flatDefaultCategories[key];
@@ -71,7 +60,7 @@ const CategoryList = ({allExpences}) => {
                     });
                     return usedCategories;
                 }
-                axios.get(`http://localhost:3001/allUserCategories`, {params: {username: username}})
+                FTrClient.get('/allUserCategories', {params: {username: username}})
                     .then(
                         async (response) => {
                             let usedCategories;
@@ -80,19 +69,18 @@ const CategoryList = ({allExpences}) => {
                                 usedCategories = Array.from(usedCategories);
                                 setCategories(usedCategories);
                                 // console.log(usedCategories);
-                                axios.post(`http://localhost:3001/allUserCategories`,
+                                await FTrClient.post('/allUserCategories',
                                     {
                                         username: username,
                                         categories: usedCategories
                                     }
                                 );
+                                groupByCategoriesAllExpences(usedCategories);
                             } else {
                                 usedCategories = response.data[0].categories;
                                 setCategories(usedCategories);
                                 groupByCategoriesAllExpences(usedCategories);
                             }
-                            // console.log(usedCategories);
-
                         }
                     );
             }
@@ -101,12 +89,23 @@ const CategoryList = ({allExpences}) => {
         }, []
     );
 
+    useEffect(() => {
+        initSumByCategories(sumByCategories);
+    }, [sumByCategories]);
+
+    const sortList = (list) => {
+        const res = {}
+        const sortedKeys = Object.keys(list).sort();
+        sortedKeys.forEach(key => res[key] = list[key]);
+        console.log(res);
+        return res;
+    }
+
 
     const groupByCategoriesAllExpences = (usedCategories) => {
-        if(!usedCategories || usedCategories.length < 1) {
+        if (!usedCategories || usedCategories.length < 1) {
             return;
         }
-        console.log(usedCategories);
         const flatCodesCategories = {};
         const flatShopsCategories = {}
         usedCategories.forEach(item => {
@@ -117,27 +116,30 @@ const CategoryList = ({allExpences}) => {
                 flatShopsCategories[shop] = item;
             });
         });
-        console.log(flatCodesCategories);
-        console.log(flatCodesCategories);
+        const sumByCtgLocal = {};
         const groupedByCtg = expences.reduce((accumulator, currentValue) => {
             const foundByShopCategory = flatShopsCategories[currentValue.details];
             if (foundByShopCategory) {
                 (accumulator[foundByShopCategory.name] = accumulator[foundByShopCategory.name] || []).push(currentValue);
+                sumByCtgLocal[foundByShopCategory.name] = (sumByCtgLocal[foundByShopCategory.name] || 0) + currentValue.sum;
                 return accumulator;
             }
             const foundByCodeCategory = flatCodesCategories[currentValue.categoryCode];
             if (foundByCodeCategory) {
+                console.log(foundByCodeCategory);
                 (accumulator[foundByCodeCategory.name] = accumulator[foundByCodeCategory.name] || []).push(currentValue);
+                sumByCtgLocal[foundByCodeCategory.name] = (sumByCtgLocal[foundByCodeCategory.name] || 0) + currentValue.sum;
                 return accumulator;
             }
             (accumulator['Others'] = accumulator['Others'] || []).push(currentValue);
+            sumByCtgLocal['Others'] = (sumByCtgLocal['Others'] || 0) + currentValue.sum;
             return accumulator;
         }, {});
         console.log(groupedByCtg);
-        setGroupedByCategory(groupedByCtg);
+        setSumByCategories(sumByCtgLocal);
+        setGroupedByCategory(sortList(groupedByCtg));
     }
     const toggleItem = (e) => {
-        console.log(categories);
         const classList = e.currentTarget.classList;
         const nextElement = e.currentTarget.nextSibling;
         if (!classList.contains('active')) {
@@ -190,7 +192,7 @@ const CategoryList = ({allExpences}) => {
             </>
         } else {
             return <>
-                <span>{key}</span>
+                <span>{key} <strong>{sumByCategories[key]}</strong></span>
                 <button className="btn"
                         onClick={() => {
                             setOnEdit(key);
@@ -208,97 +210,109 @@ const CategoryList = ({allExpences}) => {
         const value = newGroupedByCategory[key];
         delete newGroupedByCategory[key];
         // console.log(selectedCategory);
-        console.log(newGroupedByCategory[selectedCategory]);
 
         newGroupedByCategory[selectedCategory] = newGroupedByCategory[selectedCategory] ? [...newGroupedByCategory[selectedCategory], ...value] : [...value];
-        console.log(newGroupedByCategory);
         setGroupedByCategory(newGroupedByCategory);
         setOnEdit(null);
+
 
         const newCategories = [...categories];
         const targetCategory = newCategories.find(value => value.name === selectedCategory);
         targetCategory && targetCategory.codes.push(key);
         // console.log(newCategories);
         setCategories(newCategories);
-        axios.patch(`http://localhost:3001/editUserCategoryCode`, {
+        FTrClient.patch(`/editUserCategoryCode`, {
             username: 'salatsynskahv@gmail.com',
             categoryName: selectedCategory,
             codes: targetCategory.codes
 
         }).then((response) => {
-                console.log(response);
+                // console.log(response);
             }
         );
         // console.log(targetCategory);
+    }
+
+    const showDateRange = () => {
+        console.log(allRecords);
+        if(!allRecords || allRecords.length <= 0) {
+            return;
+        }
+        const start = allRecords[allRecords.length-1]?.dateOfOperation;
+        const end = allRecords[0]?.dateOfOperation;
+        return start.slice(0, 10) + ' - '+ end.slice(0,10);
     }
 
     return (
         <>
             {
                 categories &&
-                <div className="d-flex">
-                    <div>
-                        <div className="d-flex align-middle">
-                            <span className="create-category-title"> All Categories </span>
-                            <CreateCategory categories={categories} setCategories={setCategories}/>
+                    <div className="custom-category-container">
+                        <div>
+                            <div className="d-flex align-middle">
+                                <span className="custom-category-title"> All Categories </span>
+                                <CreateCategory categories={categories} setCategories={setCategories}/>
+                            </div>
+                            <CategoryNamesList
+                                categories={categories}
+                                setCategories={setCategories}
+                                toggleItem={toggleItem}
+                            />
                         </div>
-                        <CategoryNamesList
-                            categories={categories}
-                            setCategories={setCategories}
-                            toggleItem={toggleItem}
-                        />
-                    </div>
-                    <div className="list-container">
-                        <ul className="acc">
-                            {
-                                Object.entries(groupedByCategory).map(([key, values]) => (
-                                        <li key={key} className="li-item">
-                                            {nameSpan(key)}
-                                            <button className="acc_ctrl" onClick={toggleItem}>
-                                            </button>
-                                            <div className="acc_panel">
-                                                {
-                                                    values.map(item =>
-                                                        <div key={item.dateOfOperation} className="category-item">
-                                                            <p> {item.details} </p>
-                                                            <p> {item.sum}</p>
-                                                            <PopoverCategoryChange item={item}
-                                                                                   changeCategory={(category, expenseItem) => {
-                                                                                       console.log(category);
+                        <div className="list-container">
+                            <div className="date-range"><p>Date range: {showDateRange()}</p></div>
+                            <ul className="acc">
+                                {
+                                    Object.entries(groupedByCategory).map(([key, values]) => (
+                                            <li key={key} className="li-item">
+                                                {nameSpan(key)}
 
-                                                                                       const newCategories = [...categories];
-                                                                                       const targetCategory = newCategories.find(item => item.name === category);
-                                                                                       if (targetCategory) {
-                                                                                           targetCategory.shops.push(expenseItem.details);
-                                                                                           setCategories(newCategories);
-                                                                                           console.log(categories);
-                                                                                       }
-                                                                                       console.log(expenseItem);
+                                                <button className="acc_ctrl" onClick={toggleItem}>
+                                                </button>
+                                                <div className="acc_panel">
+                                                    {
+                                                        values.map(item =>
+                                                            <div key={item.dateOfOperation} className="category-item">
+                                                                <p> {item.details} </p>
+                                                                <p> {item.sum}</p>
+                                                                <PopoverCategoryChange item={item}
+                                                                                       changeCategory={(category, expenseItem) => {
+                                                                                           // console.log(category);
 
-                                                                                       axios.patch(`http://localhost:3001/editUserCategoryShop`, {
-                                                                                           username: 'salatsynskahv@gmail.com',
-                                                                                           categoryName: targetCategory.name,
-                                                                                           shops: targetCategory.shops
-
-                                                                                       }).then((response) => {
-                                                                                               // groupByCategoriesAllExpences(categories);
-
+                                                                                           const newCategories = [...categories];
+                                                                                           const targetCategory = newCategories.find(item => item.name === category);
+                                                                                           if (targetCategory) {
+                                                                                               targetCategory.shops.push(expenseItem.details);
+                                                                                               setCategories(newCategories);
+                                                                                               // console.log(categories);
                                                                                            }
-                                                                                       );
+                                                                                           // console.log(expenseItem);
 
-                                                                                   }}
-                                                                                   categories={categories}
-                                                            />
-                                                        </div>)
-                                                }
-                                            </div>
-                                        </li>
+                                                                                           FTrClient.patch('/editUserCategoryShop', {
+                                                                                               username: 'salatsynskahv@gmail.com',
+                                                                                               categoryName: targetCategory.name,
+                                                                                               shops: targetCategory.shops
+
+                                                                                           }).then((response) => {
+                                                                                                   groupByCategoriesAllExpences(categories);
+                                                                                               }
+                                                                                           );
+
+                                                                                       }}
+                                                                                       categories={categories}
+                                                                />
+                                                            </div>)
+                                                    }
+                                                </div>
+                                            </li>
+                                        )
                                     )
-                                )
-                            }
-                        </ul>
+                                }
+                            </ul>
+                        </div>
                     </div>
-                </div>}
+
+            }
         </>
     )
 
